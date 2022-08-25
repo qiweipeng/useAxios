@@ -1,7 +1,7 @@
 {
   "name": "@qiweipeng/use-axios",
-  "version": "0.0.3",
-  "description": "A axios hook.",
+  "version": "0.0.5",
+  "description": "An axios hook.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "files": [
