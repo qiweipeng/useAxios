@@ -105,7 +105,7 @@ const useAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
           signal: abortControllerRef.current.signal,
           ...configRef.current,
           ...c,
-          params: {...configRef.current.params, ...c?.params},
+          params: c?.params && {...configRef.current.params, ...c.params},
           data:
             c?.data === undefined || c.data === null
               ? configRef.current.data
