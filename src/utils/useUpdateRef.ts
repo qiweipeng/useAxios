@@ -1,6 +1,6 @@
-import {MutableRefObject, useRef, useEffect} from 'react';
+import {useRef, useEffect} from 'react';
 
-export default function useUpdateRef<T>(value: T): MutableRefObject<T> {
+export default function useUpdateRef<T>(value: T) {
   const ref = useRef(value);
 
   useEffect(() => {

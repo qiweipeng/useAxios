@@ -1,9 +1,7 @@
 import {useEffect} from 'react';
-import * as yup from 'yup';
+import {z} from 'zod';
 import {
   useAxios,
-  isCancel,
-  isAxiosError,
   AxiosRequestConfig,
   AxiosResponse,
   AxiosError,
@@ -13,32 +11,24 @@ import {
 } from './useAxios';
 import useUpdateRef from './utils/useUpdateRef';
 
-class ValidationError<T, D> extends Error {
+class ValidationError<T, D> extends z.ZodError {
   response: AxiosResponse<T, D>;
-  constructor(
-    name: string,
-    message: string,
-    response: AxiosResponse<T, D>,
-    stack?: string,
-  ) {
-    super();
-    this.name = name;
-    this.message = message;
+  constructor(issues: z.ZodIssue[], response: AxiosResponse<T, D>) {
+    super(issues);
     this.response = response;
-    this.stack = stack;
   }
 }
 
 const useValidatedAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
   config: AxiosRequestConfig<D>,
   options?: Options,
-  validationSchema?: yup.BaseSchema,
+  validationSchema?: z.Schema<T>,
 ): {
   response?: R;
   error?: ValidationError<unknown, D> | AxiosError<unknown, D> | Error | Cancel;
   loading: boolean;
-  fetchData: (config?: AxiosRequestConfig<D>) => void;
-  fetchDataAsync: (config?: AxiosRequestConfig<D>) => Promise<R>;
+  fetch: (config?: AxiosRequestConfig<D>) => void;
+  fetchAsync: (config?: AxiosRequestConfig<D>) => Promise<R>;
   cancel: () => void;
   requestInterceptors: AxiosInterceptorManager<AxiosRequestConfig<D>>;
   responseInterceptors: AxiosInterceptorManager<AxiosResponse<T, D>>;
@@ -47,8 +37,8 @@ const useValidatedAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
     response,
     error,
     loading,
-    fetchData,
-    fetchDataAsync,
+    fetch,
+    fetchAsync,
     cancel,
     requestInterceptors,
     responseInterceptors,
@@ -60,23 +50,13 @@ const useValidatedAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
     const responseInterceptor = responseInterceptors.use(r => {
       if (validationSchemaRef.current) {
         try {
-          const validatedData = validationSchemaRef.current.validateSync(
-            r.data,
-          );
+          const validatedData = validationSchemaRef.current.parse(r.data);
           r.data = validatedData;
         } catch (e) {
-          if (e instanceof yup.ValidationError) {
-            return Promise.reject(
-              new ValidationError<unknown, D>(e.name, e.message, r, e.stack),
-            );
+          if (e instanceof z.ZodError) {
+            return Promise.reject(new ValidationError<unknown, D>(e.issues, r));
           }
-          return Promise.reject(
-            new ValidationError<unknown, D>(
-              'OtherValidationError',
-              'unkonwn validation error',
-              r,
-            ),
-          );
+          return Promise.reject(new ValidationError<unknown, D>([], r));
         }
       }
       return r;
@@ -90,20 +70,12 @@ const useValidatedAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
     response,
     error,
     loading,
-    fetchData,
-    fetchDataAsync,
+    fetch,
+    fetchAsync,
     cancel,
     requestInterceptors,
     responseInterceptors,
   };
 };
 
-export type {
-  AxiosRequestConfig,
-  AxiosResponse,
-  AxiosError,
-  Cancel,
-  AxiosInterceptorManager,
-  Options,
-};
-export {useValidatedAxios, isCancel, isAxiosError, ValidationError};
+export {useValidatedAxios, ValidationError};

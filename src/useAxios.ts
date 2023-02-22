@@ -22,7 +22,7 @@ type State<T, D, R = AxiosResponse<T, D>> = {
 };
 
 type Action<T, D, R = AxiosResponse<T, D>> = {
-  type: 'start' | 'cancel' | 'resolve' | 'reject';
+  type: 'start' | 'resolve' | 'reject';
   response?: R;
   error?: AxiosError<unknown, D> | Error | Cancel;
 };
@@ -34,11 +34,6 @@ function reducer<T, D, R>(state: State<T, D, R>, action: Action<T, D, R>) {
         ...state,
         loading: true,
       };
-    case 'cancel':
-      return {
-        ...state,
-        loading: false,
-      };
     case 'resolve':
       return {
         response: action.response,
@@ -47,7 +42,7 @@ function reducer<T, D, R>(state: State<T, D, R>, action: Action<T, D, R>) {
       };
     case 'reject':
       return {
-        response: undefined,
+        ...state,
         error: action.error,
         loading: false,
       };
@@ -72,8 +67,8 @@ const useAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
   response?: R;
   error?: AxiosError<unknown, D> | Error | Cancel;
   loading: boolean;
-  fetchData: (config?: AxiosRequestConfig<D>) => void;
-  fetchDataAsync: (config?: AxiosRequestConfig<D>) => Promise<R>;
+  fetch: (config?: AxiosRequestConfig<D>) => void;
+  fetchAsync: (config?: AxiosRequestConfig<D>) => Promise<R>;
   cancel: () => void;
   requestInterceptors: AxiosInterceptorManager<AxiosRequestConfig<D>>;
   responseInterceptors: AxiosInterceptorManager<AxiosResponse<T, D>>;
@@ -90,10 +85,9 @@ const useAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
 
   const cancel = useCallback(() => {
     abortControllerRef.current?.abort();
-    dispatch({type: 'cancel'});
   }, []);
 
-  const fetchDataAsync = useCallback(
+  const fetchAsync = useCallback(
     async (c?: AxiosRequestConfig<D>) => {
       const timeout = setTimeout(() => {
         dispatch({type: 'start'});
@@ -105,7 +99,9 @@ const useAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
           signal: abortControllerRef.current.signal,
           ...configRef.current,
           ...c,
-          params: c?.params && {...configRef.current.params, ...c.params},
+          params: c?.params
+            ? {...configRef.current.params, ...c.params}
+            : configRef.current.params,
           data:
             c?.data === undefined || c.data === null
               ? configRef.current.data
@@ -127,20 +123,20 @@ const useAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
     },
     [cancel, configRef, instance, optionsRef],
   );
-  const fetchData = useCallback(
+  const fetch = useCallback(
     (c?: AxiosRequestConfig<D>) => {
-      fetchDataAsync(c).catch(() => {
+      fetchAsync(c).catch(() => {
         return;
       });
     },
-    [fetchDataAsync],
+    [fetchAsync],
   );
 
   useEffect(() => {
     if (optionsRef.current?.manual === false) {
-      fetchData();
+      fetch();
     }
-  }, [fetchData, optionsRef]);
+  }, [fetch, optionsRef]);
 
   useEffect(() => {
     return () => {
@@ -152,8 +148,8 @@ const useAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
     response: state.response,
     error: state.error,
     loading: state.loading,
-    fetchData,
-    fetchDataAsync,
+    fetch,
+    fetchAsync,
     cancel,
     requestInterceptors: instance.interceptors.request,
     responseInterceptors: instance.interceptors.response,
