@@ -30,6 +30,7 @@
   - [useValidatedAxios()](#usevalidatedaxios)
     - [validationSchema（可选）参数](#validationschema可选参数)
     - [ValidationError](#validationerror)
+- [协议](#协议)
 
 ## 功能点
 
@@ -403,3 +404,7 @@ class ValidationError<T, D> extends z.ZodError {
 ```
 
 关于 `ZodError` 具体参见 [Error handling](https://zod.dev/?id=error-handling)。
+
+## 协议
+
+MIT
