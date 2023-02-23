@@ -1,14 +1,6 @@
 import {useEffect} from 'react';
 import {z} from 'zod';
-import {
-  useAxios,
-  AxiosRequestConfig,
-  AxiosResponse,
-  AxiosError,
-  Cancel,
-  Options,
-  AxiosInterceptorManager,
-} from './useAxios';
+import {useAxios, AxiosRequestConfig, AxiosResponse, Options} from './useAxios';
 import useUpdateRef from './utils/useUpdateRef';
 
 class ValidationError<T, D> extends z.ZodError {
@@ -23,16 +15,7 @@ const useValidatedAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
   config: AxiosRequestConfig<D>,
   options?: Options,
   validationSchema?: z.Schema<T>,
-): {
-  response?: R;
-  error?: ValidationError<unknown, D> | AxiosError<unknown, D> | Error | Cancel;
-  loading: boolean;
-  fetch: (config?: AxiosRequestConfig<D>) => void;
-  fetchAsync: (config?: AxiosRequestConfig<D>) => Promise<R>;
-  cancel: () => void;
-  requestInterceptors: AxiosInterceptorManager<AxiosRequestConfig<D>>;
-  responseInterceptors: AxiosInterceptorManager<AxiosResponse<T, D>>;
-} => {
+) => {
   const {
     response,
     error,
