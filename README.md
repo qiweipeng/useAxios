@@ -356,6 +356,7 @@ export function Qux() {
 
 ``` typescript
 import {useAxios} from '@qiweipeng/use-axios';
+import {z} from 'zod';
 
 export function Fred() {
   const {fetchAsync} = useValidatedAxios(
