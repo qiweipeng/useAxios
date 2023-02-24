@@ -158,8 +158,8 @@ flowchart LR
 
 classDef node text-align:left,fill:#fff,stroke:#999,color:#000;
 
-A[response: undefined<br>error: undefiend<br>loading: false] -->|"fetch()/fetchAsync()"| B[response: 维持上个状态<br>error: 维持上个状态<br>loading: true]
-B -->|成功| C["response: R<br>error: undefiend<br>loading: false"]
+A[response: undefined<br>error: undefined<br>loading: false] -->|"fetch()/fetchAsync()"| B[response: 维持上个状态<br>error: 维持上个状态<br>loading: true]
+B -->|成功| C["response: R<br>error: undefined<br>loading: false"]
 B -->|失败| D["response: 维持上个状态<br>error: AxiosError<unknown, D> | Error | Cancel<br>loading: false"]
 C --> |"fetch()/fetchAsync()"|B
 D --> |"fetch()/fetchAsync()"|B
