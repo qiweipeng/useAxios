@@ -122,7 +122,6 @@ export function Bar() {
   });
 
   function handleLoginButtonClick() {
-    console.log('d');
     fetchAsync({
       data: {
         username: 'roger',
