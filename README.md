@@ -290,7 +290,7 @@ export function Baz() {
       },
       e => {
         // 做一些事情
-        return e;
+        return Promise.reject(e);
       },
     );
     return () => {
@@ -325,7 +325,7 @@ export function Qux() {
       },
       e => {
         // 做一些事情
-        return e;
+        return Promise.reject(e);
       },
     );
     return () => {
