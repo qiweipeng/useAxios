@@ -7,6 +7,7 @@ class ValidationError<T, D> extends z.ZodError {
   response: AxiosResponse<T, D>;
   constructor(issues: z.ZodIssue[], response: AxiosResponse<T, D>) {
     super(issues);
+    this.name = 'ValidationError';
     this.response = response;
   }
 }
