@@ -1,5 +1,6 @@
 import {useEffect} from 'react';
 import {z} from 'zod';
+import {generateMock} from '@anatine/zod-mock';
 import {useAxios, AxiosRequestConfig, AxiosResponse, Options} from './useAxios';
 import useUpdateRef from './utils/useUpdateRef';
 
@@ -12,9 +13,13 @@ class ValidationError<T, D> extends z.ZodError {
   }
 }
 
+interface ValidationOptions extends Options {
+  mock?: boolean; // default is false
+}
+
 const useValidatedAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
   config: AxiosRequestConfig<D>,
-  options?: Options,
+  options?: ValidationOptions,
   validationSchema?: z.Schema<T>,
 ) => {
   const {
@@ -29,26 +34,40 @@ const useValidatedAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
   } = useAxios<T, D, R>(config, options);
 
   const validationSchemaRef = useUpdateRef(validationSchema);
+  const optionsRef = useUpdateRef(options);
 
   useEffect(() => {
-    const responseInterceptor = responseInterceptors.use(r => {
-      if (validationSchemaRef.current) {
-        try {
-          const validatedData = validationSchemaRef.current.parse(r.data);
-          r.data = validatedData;
-        } catch (e) {
-          if (e instanceof z.ZodError) {
-            return Promise.reject(new ValidationError<unknown, D>(e.issues, r));
+    const responseInterceptor = responseInterceptors.use(
+      r => {
+        if (validationSchemaRef.current) {
+          try {
+            const validatedData =
+              optionsRef.current?.mock === true
+                ? generateMock(validationSchemaRef.current)
+                : validationSchemaRef.current.parse(r.data);
+            r.data = validatedData;
+          } catch (e) {
+            if (e instanceof z.ZodError) {
+              return Promise.reject(
+                new ValidationError<unknown, D>(e.issues, r),
+              );
+            }
+            return Promise.reject(new ValidationError<unknown, D>([], r));
           }
-          return Promise.reject(new ValidationError<unknown, D>([], r));
         }
-      }
-      return r;
-    });
+        return r;
+      },
+      e => {
+        if (optionsRef.current?.mock === true && validationSchemaRef.current) {
+          return {status: 200, data: generateMock(validationSchemaRef.current)};
+        }
+        return Promise.reject(e);
+      },
+    );
     return () => {
       responseInterceptors.eject(responseInterceptor);
     };
-  }, [responseInterceptors, validationSchemaRef]);
+  }, [optionsRef, responseInterceptors, validationSchemaRef]);
 
   return {
     response,
@@ -62,4 +81,5 @@ const useValidatedAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
   };
 };
 
+export type {ValidationOptions};
 export {useValidatedAxios, ValidationError};

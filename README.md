@@ -29,6 +29,7 @@
       - [responseInterceptors](#responseinterceptors)
   - [useValidatedAxios()](#usevalidatedaxios)
     - [validationSchema（可选）参数](#validationschema可选参数)
+    - [options新增字段(可选)](#options新增字段可选)
     - [ValidationError](#validationerror)
 - [协议](#协议)
 
@@ -42,11 +43,11 @@
   - [x] 竞态取消
 - [x] 手动请求（默认）或自动请求
 - [x] loading delay
+- [x] mock
 - [ ] 防抖
 - [ ] 轮询
 - [ ] 错误重试
 - [ ] 依赖刷新
-- [ ] 日志
 
 ## 快速开始
 
@@ -339,7 +340,7 @@ export function Qux() {
 
 ### useValidatedAxios()
 
-`useValidatedAxios()` 是在 `useAxios()` 的基础上增加 `Zod` 库的支持，参数增加 `validationSchema`，返回值中 `error` 的类型增加 `ValidationError` 类型，除此之外完全相同。使用 `useValidatedAxios()` 时如果不传 `validationSchema` 参数则和 `useAxios` 用法完全一致。
+`useValidatedAxios()` 是在 `useAxios()` 的基础上增加 `Zod` 库的支持，参数增加 `validationSchema`，`options` 参数中增加 `mock` 字段，返回值中 `error` 的类型增加 `ValidationError` 类型，除此之外完全相同。使用 `useValidatedAxios()` 时如果不传 `validationSchema` 参数则和 `useAxios` 用法完全一致。
 
 #### validationSchema（可选）参数
 
@@ -388,6 +389,14 @@ export function Fred() {
   );
 }
 ```
+
+#### options新增字段(可选)
+
+| option | 描述 | 类型 | 默认值 |
+|--------|-----|:----:|:-----:|
+| `mock`       | 是否使用 mock 数据（如果是则请求一定成功且按照 `validationSchema` 的描述提供 mock 数据），只在 `validationSchema` 不为空时才有效；需要注意的是，`mock` 开启后，请求响应中除了 `status` 和 `data` 外的字段均有可能为空⚠️                | `boolean`      | `false`   |
+
+参见 [zod-mock](https://github.com/anatine/zod-plugins/tree/main/packages/zod-mock)。
 
 #### ValidationError
 
