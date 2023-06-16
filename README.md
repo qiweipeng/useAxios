@@ -344,7 +344,7 @@ export function Qux() {
 
 #### validationSchema（可选）参数
 
-这是一个 `Zod` 中的 `Schema` 类型，具体参见 [Zod](https://zod.dev)。
+这是一个 `Zod` 中的 `ZodTypeAny` 类型，具体参见 [Zod](https://zod.dev)。
 
 使用中，该参数用于描述 `response` 中的数据格式，具体可以：
 

@@ -17,10 +17,15 @@ interface ValidationOptions extends Options {
   mock?: boolean; // default is false
 }
 
-const useValidatedAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
+const useValidatedAxios = <
+  S extends z.ZodTypeAny,
+  T extends z.infer<S> = unknown,
+  D = unknown,
+  R = AxiosResponse<T, D>,
+>(
   config: AxiosRequestConfig<D>,
   options?: ValidationOptions,
-  validationSchema?: z.Schema<T>,
+  validationSchema?: S,
 ) => {
   const {
     response,
