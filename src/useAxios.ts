@@ -105,7 +105,8 @@ const useAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
           data:
             c?.data === undefined || c.data === null
               ? configRef.current.data
-              : typeof c.data === 'object'
+              : typeof c.data === 'object' &&
+                c.data instanceof FormData === false
               ? {...configRef.current.data, ...c.data}
               : c.data,
         });
