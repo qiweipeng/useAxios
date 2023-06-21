@@ -135,7 +135,9 @@ const useAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
 
   useEffect(() => {
     if (optionsRef.current?.manual === false) {
-      fetch();
+      setTimeout(() => {
+        fetch();
+      }, 0);
     }
   }, [fetch, optionsRef]);
 
