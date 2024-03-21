@@ -78,7 +78,7 @@ export function Foo() {
         ''
       },
     },
-    {manual: false}, // 页面加载后自动请求一次
+    {automatic: true}, // 页面加载后自动请求一次
   );
 
   // 页面加载中，展示加载指示器
@@ -202,7 +202,7 @@ D --> |"fetch()/fetchAsync()"|B
 
 | option | 描述 | 类型 | 默认值 |
 |--------|-----|:----:|:-----:|
-| `manual`       | 是否是手动请求（如果是自动请求则会在组件加载后进行一次请求）                | `boolean`      | `true`   |
+| `automatic`       | 是否是自动请求（如果是自动请求则会在组件加载后进行一次请求）                | `boolean`      | `false`   |
 | `loadingDelay` | loading 状态是否延迟更改，单位为毫秒（请求开始后在 loadingDelay 范围内 loading 状态保持为 false 不变） | `number` | `0`      |
 
 #### 返回值

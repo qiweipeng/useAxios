@@ -56,7 +56,7 @@ const initialState = {
 };
 
 type Options = {
-  manual?: boolean; // default is true
+  automatic?: boolean; // default is false
   loadingDelay?: number; // default is 0
 };
 
@@ -134,7 +134,7 @@ const useAxios = <T = unknown, D = unknown, R = AxiosResponse<T, D>>(
   );
 
   useEffect(() => {
-    if (optionsRef.current?.manual === false) {
+    if (optionsRef.current?.automatic === true) {
       setTimeout(() => {
         fetch();
       }, 0);
